@@ -2,6 +2,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import Callable, Dict, List, Optional, Tuple, Type, Union
 
+from pydantic import BaseModel
 from fastapi import Request, Response
 from redis import client
 
@@ -129,6 +130,8 @@ class FastApiRedisCache(metaclass=MetaSingleton):
     ) -> None:
         response.headers[self.response_header] = "Hit" if cache_hit else "Miss"
         expires_at = datetime.utcnow() + timedelta(seconds=ttl)
+        actual_response = response_data.json() if isinstance(response_data, BaseModel) else response_data
+        response.headers["Content-Length"] = str(len(str(actual_response)))
         response.headers["Expires"] = expires_at.strftime(HTTP_TIME)
         response.headers["Cache-Control"] = f"max-age={ttl}"
         response.headers["ETag"] = self.get_etag(response_data)
