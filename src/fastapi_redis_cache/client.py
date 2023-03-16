@@ -130,7 +130,7 @@ class FastApiRedisCache(metaclass=MetaSingleton):
     ) -> None:
         response.headers[self.response_header] = "Hit" if cache_hit else "Miss"
         expires_at = datetime.utcnow() + timedelta(seconds=ttl)
-        actual_response = response_data.json() if isinstance(response_data, BaseModel) else response_data
+        actual_response = response_data.json(by_alias=True) if isinstance(response_data, BaseModel) else response_data
         response.headers["Content-Length"] = str(len(str(actual_response)))
         response.headers["Expires"] = expires_at.strftime(HTTP_TIME)
         response.headers["Cache-Control"] = f"max-age={ttl}"

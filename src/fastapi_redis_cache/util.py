@@ -24,7 +24,7 @@ SERIALIZE_OBJ_MAP = {
 class BetterJsonEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, BaseModel):
-            return json.loads(obj.json())
+            return json.loads(obj.json(by_alias=True))
         elif isinstance(obj, datetime):
             return {"val": obj.strftime(DATETIME_AWARE), "_spec_type": str(datetime)}
         elif isinstance(obj, date):
